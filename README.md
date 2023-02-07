@@ -1,97 +1,66 @@
-👉 推荐 [Gitee同步](https://gitee.com/programmercarl/skiplist)
+# SkipList-cpp
 
-> 版权申明： 本项目为我（[程序员Carl](https://github.com/youngyangyang04)）的原创。引用本项目文章请注明出处，例如：转自 https://github.com/youngyangyang04/Skiplist-CPP。
-> 发现恶意抄袭或搬运，会动用法律武器维护自己的权益。让我们一起维护一个良好的技术创作环境！
+NewSQL 是对各种新的可扩展/高性能数据库的简称，这类数据库不仅具有NoSQL对海量数据的存储管理能力，还保持了传统数据库支持 ACID 和 SQL 等特性。其中，非关系型数据库redis，以及levedb，rockdb其核心存储引擎的数据结构就是跳表。
 
-# [English Version](./README-en.md)
+本项目基于跳表实现的轻量级键值型存储引擎，使用C++实现。插入数据、删除数据、查询数据、数据展示、数据落盘、文件加载数据，以及数据库大小显示。
 
-# KV存储引擎
+在随机写读情况下，该项目每秒可处理写请求数（QPS）: 29.78w，每秒可处理读请求数（QPS）: 27.03w（测试条件基于实验室服务器下，不同性能和环境有影响）
 
-众所周知，非关系型数据库redis，以及levedb，rockdb其核心存储引擎的数据结构就是跳表。
+本项目还提供了存储引擎的客户端和服务端，并在服务端中实现了读操作和写操作的分离，提高读取速度。
 
-本项目就是基于跳表实现的轻量级键值型存储引擎，使用C++实现。插入数据、删除数据、查询数据、数据展示、数据落盘、文件加载数据，以及数据库大小显示。
+## 性能测试
+分别按照 10万、50万、100万条存取请求对存储引擎进行压力测试。
 
-在随机写读情况下，该项目每秒可处理啊请求数（QPS）: 24.39w，每秒可处理读请求数（QPS）: 18.41w
+跳表树高 `level` 为：18
 
-# 项目中文件
-
-* main.cpp 包含skiplist.h使用跳表进行数据操作
-* skiplist.h 跳表核心实现
-* README.md 中文介绍    
-* README-en.md 英文介绍       
-* bin 生成可执行文件目录 
-* makefile 编译脚本
-* store 数据落盘的文件存放在这个文件夹 
-* stress_test_start.sh 压力测试脚本
-* LICENSE 使用协议
-
-# 提供接口
-
-* insertElement（插入数据）
-* deleteElement（删除数据）
-* searchElement（查询数据）
-* displayList（展示已存数据）
-* dumpFile（数据落盘）
-* loadFile（加载数据）
-* size（返回数据规模）
+采用随机插入和读取数据进行测试。
 
 
-# 存储引擎数据表现
 
-## 插入操作
+### 测试环境
 
-跳表树高：18 
+编译环境：
+- gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04)
+- GNU Make 4.1
 
-采用随机插入数据测试：
-
-
-|插入数据规模（万条） |耗时（秒） | 
-|---|---|
-|10 |0.316763 |
-|50 |1.86778 |
-|100 |4.10648 |
+系统版本：
+- Ubuntu 18.04虚拟机
 
 
-每秒可处理写请求数（QPS）: 24.39w
 
-## 取数据操作
+## 项目运行方式
 
-|取数据规模（万条） |耗时（秒） | 
-|---|---|
-|10|0.47148 |10|
-|50|2.56373 |50|
-|100|5.43204 |100|
+运行 shell 脚本
 
-每秒可处理读请求数（QPS）: 18.41w
-
-# 项目运行方式
-
-```
-make            // complie demo main.cpp
-./bin/main      // run 
+```shell
+sh ./run.sh
 ```
 
-如果想自己写程序使用这个kv存储引擎，只需要在你的CPP文件中include skiplist.h 就可以了。
+获得三个可执行文件
 
-可以运行如下脚本测试kv存储引擎的性能（当然你可以根据自己的需求进行修改）
-
+```text
+./bin
+├── client
+├── server
+└── test
+    ├── test_base_function
+    ├── test_stress
+    └── test_threadPool
 ```
-sh stress_test_start.sh 
-```
+- client：实例客户端
+- server：实例服务端
+- test_base_function：存储引擎的基本功能测试
+- test_stress：存储引擎的压力测试
+- test_threadPool：服务端的线程池功能测试
 
-# 待优化 
+> 如何在自己的项目中使用该存储引擎？
 
-* delete的时候没有释放内存
-* 压力测试并不是全自动的
-* 跳表的key用int型，如果使用其他类型需要自定义比较函数，当然把这块抽象出来更好
-* 如果再加上一致性协议，例如raft就构成了分布式存储，再启动一个http server就可以对外提供分布式存储服务了
-
-# 关于作者
-
-大家好，我是程序员Carl，[《代码随想录》](https://programmercarl.com/other/publish.html)作者，哈工大师兄，先后在腾讯和百度从事分布式技术研发。
-
-* [代码随想录网站](https://programmercarl.com)
-* [代码随想录Github](https://github.com/youngyangyang04/leetcode-master)
-* [代码随想录算法公开课](https://www.bilibili.com/video/BV1fA4y1o715)
+包含头文件 `./base/SkipList.h` ，然后调用相关接口即可。
 
 
+
+## 待优化
+
+- 键值存储引擎只能使用重载了 `operator <` 的数据类型/对象，如果使用其他类型需要自定义比较函数，可以考虑把这部分抽象出来，给出一个接口，让用户放入自定义的比较函数。
+- 存储引擎的读取使用线程池，只用一个线程负责写操作，不适用于大量写操作的场合。
+- 可以加上一致性协议，例如 raft 来构成分布式存储，结合高并发网络框架后可以对外提供分布式存储服务。
